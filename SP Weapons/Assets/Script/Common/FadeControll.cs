@@ -5,6 +5,10 @@ using UnityEngine.SceneManagement;
 
 public class FadeControll : MonoBehaviour
 {
+    /// <summary>
+    /// シーンの遷移を管理
+    /// </summary>
+
     [SerializeField]
     private Animator animFadePanel;
     [SerializeField]
@@ -14,8 +18,8 @@ public class FadeControll : MonoBehaviour
     [SerializeField]
     private GameObject[] loadingText = new GameObject[13];  // LoadingText ALL Child
 
-    private BackGroundAnim titleObj = null; // DiscardObjﾒｿｯﾄﾞでnull判定を行っているのでnull
-    private AsyncOperation async = default;
+    private BackGroundAnim backGroundAnim = null; // 自作クラス、DiscardObjﾒｿｯﾄﾞでnull判定を行っているのでnull
+                                                  // ロードの際に処理が軽くなるようにいらないObjectを各シーン毎にDestroyさせたい
     private Image imageBackGround = default;
     private string currentSceneName = default;
     private string nextSceneName = default;
@@ -34,31 +38,40 @@ public class FadeControll : MonoBehaviour
 
 
 
+    public Animator GetAnimFadePanel => this.animFadePanel;
+
+
+
+
+
     private void Start()
     {
         imageBackGround = GameObject.FindWithTag(FINDWITHTAG_OBJ).GetComponent<Image>();
         currentSceneName = SceneManager.GetActiveScene().name;
 
-        DiscardObj(); // ifを通る
+        DiscardObj(); // trueを通る
     }
 
 
 
 
 
-    public void DiscardObj()
+    /* Startの際はGetcomponentで取得したりなど次のシーンへ遷移する準備をしている    *
+     * 2回目に呼ばれた際は次のシーンへ遷移する時にいらないオブジェクトをDestroyする */
+     
+    private void DiscardObj()
     {
         switch (currentSceneName)
         {
             case FIRST_SCENE_NAME:
-                if (titleObj == null)
+                if (backGroundAnim == null)
                 {
-                    titleObj = GameObject.FindWithTag(FINDWITHTAG_OBJ).GetComponent<BackGroundAnim>();
+                    backGroundAnim = GameObject.FindWithTag(FINDWITHTAG_OBJ).GetComponent<BackGroundAnim>();
                     nextSceneName = SECOND_SCENE_NAME;
                 }
                 else
                 {
-                    foreach (GameObject obj in titleObj.Get_Obj)
+                    foreach (GameObject obj in backGroundAnim.Get_Obj)
                     {
                         Destroy(obj);
                     }
@@ -74,6 +87,8 @@ public class FadeControll : MonoBehaviour
 
 
 
+
+    /* ロード画面をアクティブにする */
 
     public IEnumerator LoadUI_Active()
     {
@@ -105,8 +120,12 @@ public class FadeControll : MonoBehaviour
 
 
 
+    /* 次のシーンをロードする */
+
     public IEnumerator NextSceneLoad()
     {
+        AsyncOperation async = default;
+
         async = SceneManager.LoadSceneAsync(nextSceneName);
 
         async.allowSceneActivation = false;
@@ -127,7 +146,11 @@ public class FadeControll : MonoBehaviour
 
                 for (; ; )
                 {
-                    if (animFadePanel.GetCurrentAnimatorStateInfo(ANIM_LAYER).normalizedTime >= ANIM_TIME_BORDER)
+                    float fadeOutTime;
+
+                    fadeOutTime = animFadePanel.GetCurrentAnimatorStateInfo(ANIM_LAYER).normalizedTime;
+
+                    if (fadeOutTime >= ANIM_TIME_BORDER)
                     {
                         async.allowSceneActivation = true;
                     }
@@ -141,6 +164,8 @@ public class FadeControll : MonoBehaviour
 
 
 
+
+    /* ローディング中に表示するTextをActiveに */
 
     private IEnumerator LoadingTextActivate()
     {

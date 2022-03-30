@@ -3,8 +3,12 @@ using System.Collections;
 
 public class BackGroundAnim : MonoBehaviour
 {
+    /// <summary>
+    /// 背景のアニメーションを管理
+    /// </summary>
+
     [SerializeField]
-    private FadeControll fadeControll;
+    private FadeControll fadeControll;  // 自作クラス
     [SerializeField]
     private GameObject[] obj = new GameObject[2];   // TitleText,SystemText
     [SerializeField]
@@ -12,9 +16,13 @@ public class BackGroundAnim : MonoBehaviour
 
     private const byte TAP = 0;
     private const byte LAYER = 0;
-    private const byte ANIMATIN_TIME_BORDER = 1;
+    private const byte ANIMATION_TIME_BORDER = 1;
     private const float SKIP_PLAY_ANIMATION = 0.8f;
     private const string SKIP_TRIGGER_NAME = "SkipTrigger";
+
+
+
+
 
     public GameObject[] Get_Obj => this.obj;
 
@@ -25,6 +33,7 @@ public class BackGroundAnim : MonoBehaviour
     public IEnumerator Movie()
     {
         /* スキップ処理 */
+
         if (animBackGround.GetBool(SKIP_TRIGGER_NAME)) // true
         {
             Debug.Log("SkipTrigger is true");
@@ -33,7 +42,8 @@ public class BackGroundAnim : MonoBehaviour
         }
 
         /* シーン遷移処理 */
-        if (animBackGround.GetCurrentAnimatorStateInfo(LAYER).normalizedTime >= ANIMATIN_TIME_BORDER)
+
+        if (animBackGround.GetCurrentAnimatorStateInfo(LAYER).normalizedTime >= ANIMATION_TIME_BORDER)
         {
             Debug.Log("Animation End");
 
@@ -44,6 +54,8 @@ public class BackGroundAnim : MonoBehaviour
 
 
 
+
+    /* スキップ処理 */
 
     private IEnumerator Skip()
     {
@@ -70,6 +82,8 @@ public class BackGroundAnim : MonoBehaviour
 
 
 
+    /* シーン遷移処理 */
+
     private IEnumerator SceneChange()
     {
         for (; ; )
@@ -92,7 +106,10 @@ public class BackGroundAnim : MonoBehaviour
 
 
 
-    /* AnimationEvent */
+    /// <summary>
+    /// AnimationEvent
+    /// </summary>
+    
     public void ObjActive()
     {
         foreach(GameObject _obj in obj)

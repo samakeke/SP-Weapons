@@ -4,14 +4,23 @@ using System.Collections;
 public class TitleSceneManager : MonoBehaviour
 {
     [SerializeField]
-    private BackGroundAnim backGroundAnim;
+    private BackGroundAnim backGroundAnim;  // 自作クラス
+    
+
+
+
 
     private void Start()
     {
+        /* メインループ */
         StartCoroutine(Main());
     }
 
-    IEnumerator Main()
+
+
+
+
+    private IEnumerator Main()
     {
         for(; ; )
         {
